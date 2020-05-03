@@ -1,4 +1,4 @@
-# Mini Amazon Go
+# Mini Amazon Go [![Build Status](https://travis-ci.com/Cavaleiros-do-Xunxo/mazgo-api.svg?branch=master)](https://travis-ci.com/Cavaleiros-do-Xunxo/mazgo-api)
 
 ##### Stock Control using Computer Vision.
 
