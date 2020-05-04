@@ -4,4 +4,4 @@ LABEL maintainer="git@notfab.net"
 
 COPY build/libs/*.jar /opt/
 
-CMD ["java", "-jar", "/opt/mazgo-api.jar"]
+CMD ["java", "-Dspring.profiles.active=prod", "-jar", "/opt/mazgo-api.jar", "--spring.config.location=/opt/"]
