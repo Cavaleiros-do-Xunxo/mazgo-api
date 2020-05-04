@@ -15,5 +15,5 @@ Product:
     GET /products/{id}
     GET /products/{id}/history
     POST /products
-    PATCH /products/{idf}
+    PATCH /products
 ```

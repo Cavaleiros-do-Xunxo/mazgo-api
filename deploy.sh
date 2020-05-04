@@ -1,4 +1,4 @@
 #!/bin/bash
-docker build -t fabricio20/mazgo-api:latest .
+docker build -t cvxnx/mazgo-api:latest .
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker push fabricio20/mazgo-api:latest
+docker push cvxnx/mazgo-api:latest
