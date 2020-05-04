@@ -85,10 +85,12 @@ public class ProductRest {
     }
 
     @PATCH
-    @Path("/{idf}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateByIdentifier(@PathParam("idf") String idf, ProductUpdate update) {
-        Optional<Product> optionalProduct = repository.findByIdentifier(idf);
+    public Response updateByIdentifier(ProductUpdate update) {
+        if (update.getIdentifier() == null) {
+            throw new IllegalArgumentException("Unknown product");
+        }
+        Optional<Product> optionalProduct = repository.findByIdentifier(update.getIdentifier());
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Unknown product");
         }
