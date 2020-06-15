@@ -16,5 +16,6 @@ public class Product {
     private String name;
     private int quantity = 0;
     private String identifier; // Google Vision
+    private String image;
 
 }
