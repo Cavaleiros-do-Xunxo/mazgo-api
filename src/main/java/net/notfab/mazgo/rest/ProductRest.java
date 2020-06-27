@@ -9,65 +9,54 @@ import net.notfab.mazgo.internal.paging.PagedResponse;
 import net.notfab.mazgo.internal.paging.Paginator;
 import net.notfab.mazgo.repositories.HistoryRepository;
 import net.notfab.mazgo.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Optional;
 
-@Path("/products")
+@RestController
+@RequestMapping("/products")
 public class ProductRest {
 
-    @Autowired
-    private ProductRepository repository;
+    private final ProductRepository repository;
+    private final HistoryRepository historyRepository;
 
-    @Autowired
-    private HistoryRepository historyRepository;
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAll(@BeanParam Paginator paginator) {
-        Page<Product> page = repository.findAll(paginator.toPageable());
-        return Response
-                .ok(new PagedResponse<>(page))
-                .build();
+    public ProductRest(ProductRepository repository, HistoryRepository historyRepository) {
+        this.repository = repository;
+        this.historyRepository = historyRepository;
     }
 
-    @GET
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getById(@PathParam("id") String id) {
+    @GetMapping
+    public PagedResponse<Product> getAll(Paginator paginator) {
+        Page<Product> page = repository.findAll(paginator.toPageable());
+        return new PagedResponse<>(page);
+    }
+
+    @GetMapping
+    @RequestMapping("/{id}")
+    public Optional<Product> getById(@PathVariable String id) {
         Optional<Product> product = repository.findById(id);
         if (product.isEmpty()) {
             throw new IllegalArgumentException("Unknown product");
         }
-        return Response
-                .ok(product)
-                .build();
+        return product;
     }
 
-    @GET
-    @Path("/{id}/history")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getHistory(@PathParam("id") String id, @BeanParam Paginator paginator) {
+    @GetMapping
+    @RequestMapping("/{id}/history")
+    public Page<History> getHistory(@PathVariable("id") String id, Paginator paginator) {
         Optional<Product> product = repository.findById(id);
         if (product.isEmpty()) {
             throw new IllegalArgumentException("Unknown product");
         }
         Pageable pageable = paginator.toPageable(Sort.by(Sort.Order.desc("timestamp")));
-        Page<History> page = historyRepository.findAllByProduct(product.get(), pageable);
-        return Response
-                .ok(new PagedResponse<>(page))
-                .build();
+        return historyRepository.findAllByProduct(product.get(), pageable);
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response create(ProductBody body) {
+    @PostMapping
+    public Product create(@RequestBody ProductBody body) {
         if (body.getName() == null) {
             throw new IllegalArgumentException("Missing product name");
         }
@@ -81,12 +70,12 @@ public class ProductRest {
         product.setName(body.getName());
         product.setIdentifier(body.getIdentifier());
         product.setQuantity(body.getQuantity());
-        return Response.ok(repository.save(product)).build();
+        product.setImage(body.getImage());
+        return repository.save(product);
     }
 
-    @PATCH
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateByIdentifier(ProductUpdate update) {
+    @PatchMapping
+    public Product updateByIdentifier(@RequestBody ProductUpdate update) {
         if (update.getIdentifier() == null) {
             throw new IllegalArgumentException("Unknown product");
         }
@@ -101,7 +90,7 @@ public class ProductRest {
         HistoryAction action;
         int difference;
         if (update.getQuantity() == product.getQuantity()) {
-            return Response.accepted().build();
+            return product;
         } else if (update.getQuantity() > product.getQuantity()) {
             action = HistoryAction.ADD;
             difference = update.getQuantity() - product.getQuantity();
@@ -117,9 +106,7 @@ public class ProductRest {
         historyRepository.save(history);
         product.setQuantity(update.getQuantity());
         repository.save(product);
-        return Response
-                .accepted()
-                .build();
+        return product;
     }
 
 }

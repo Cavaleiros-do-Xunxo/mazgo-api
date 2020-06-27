@@ -2,9 +2,7 @@ package net.notfab.mazgo.entities;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Data
@@ -17,8 +15,10 @@ public class History {
     @ManyToOne
     private Product product;
 
-    private int quantity = 0;
+    @Enumerated(EnumType.STRING)
     private HistoryAction action;
+
+    private int quantity = 0;
     private String image;
     private long timestamp = System.currentTimeMillis();
 

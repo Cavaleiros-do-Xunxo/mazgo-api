@@ -8,5 +8,6 @@ public class ProductBody {
     private String name;
     private String identifier;
     private int quantity = 0;
+    private String image;
 
 }
