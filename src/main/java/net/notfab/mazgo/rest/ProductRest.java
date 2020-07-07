@@ -1,5 +1,6 @@
 package net.notfab.mazgo.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import net.notfab.mazgo.entities.History;
 import net.notfab.mazgo.entities.HistoryAction;
 import net.notfab.mazgo.entities.Product;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/products")
 public class ProductRest {
@@ -79,6 +81,7 @@ public class ProductRest {
         if (update.getIdentifier() == null) {
             throw new IllegalArgumentException("Unknown product");
         }
+        log.info("[Detection] " + update);
         Optional<Product> optionalProduct = repository.findByIdentifier(update.getIdentifier());
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Unknown product");
@@ -87,6 +90,7 @@ public class ProductRest {
             throw new IllegalArgumentException("Quantity cannot be below 0");
         }
         Product product = optionalProduct.get();
+        log.info("[Detection] " + product.getIdentifier() + "/" + product.getId());
         HistoryAction action;
         int difference;
         if (update.getQuantity() == product.getQuantity()) {
