@@ -89,6 +89,9 @@ public class ProductRest {
         if (update.getQuantity() < 0) {
             throw new IllegalArgumentException("Quantity cannot be below 0");
         }
+        if (!update.getImage().startsWith("https://")) {
+            update.setImage("https://mazgo.s3.amazonaws.com/" + update.getImage());
+        }
         Product product = optionalProduct.get();
         log.info("[Detection] " + product.getIdentifier() + "/" + product.getId());
         HistoryAction action;
